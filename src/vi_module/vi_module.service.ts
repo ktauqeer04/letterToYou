@@ -1,4 +1,6 @@
+import { MailerService } from '@nestjs-modules/mailer';
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/prisma/prisma.service';
 
@@ -6,22 +8,31 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class ViModuleService{
     constructor(
         private readonly prisma: PrismaService,
-        private readonly jwtService: JwtService
+        private readonly jwtService: JwtService,
+        private readonly emailService: MailerService,
+        private readonly configService: ConfigService
     ) {}
 
     async create(payload: any) {
 
         try {
+
             const createLetter = await this.prisma.letter.create({
                 data: payload
             });
 
             const token = this.jwtService.sign({ 
-                uuid: createLetter.uuid,
-                email: createLetter.email,
+                uuid: createLetter.uuid
              });
 
-             console.log(token);
+            const url = `${this.configService.get<string>('DEV_URL')}/vi-module/${token}`;
+
+            await this.emailService.sendMail({
+                to: payload.email,
+                subject: 'Verify your letter',
+                template: './verify',
+                text: `Please verify your letter by clicking on the link below: ${url}`,
+            }); 
 
             return token;
         } catch (error: any) {
@@ -38,7 +49,7 @@ export class ViModuleService{
             const decoded = this.jwtService.verify(token);
 
             if(decoded){
-                const letter = await this.prisma.letter.update({
+                await this.prisma.letter.update({
                     where: {
                         uuid: decoded.uuid
                     },

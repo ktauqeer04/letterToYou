@@ -6,11 +6,12 @@ import { PrismaModule } from './prisma/prisma.module';
 import { ViModuleService } from './vi_module/vi_module.service';
 import { ViModuleModule } from './vi_module/vi_module.module';
 import { JwtModule } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [PrismaModule, ViModuleModule, JwtModule],
   controllers: [AppController],
-  providers: [AppService, PrismaService, ViModuleService],
+  providers: [AppService, PrismaService, ViModuleService, ConfigService],
 })
 export class AppModule {}
   

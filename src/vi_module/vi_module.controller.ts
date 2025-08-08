@@ -6,7 +6,9 @@ import { CreateLetterDto } from './dto/vi_module.dto';
 @Controller('vi-module')
 export class ViModuleController {
 
-    constructor(private readonly viModuleService: ViModuleService) {}
+    constructor(
+        private readonly viModuleService: ViModuleService
+    ) {}
 
     
     @Post()

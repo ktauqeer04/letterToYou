@@ -4,11 +4,13 @@ import { ViModuleService } from './vi_module.service';
 import { PrismaModule } from '../prisma/prisma.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
+import { MailerModule } from '@nestjs-modules/mailer';
 
 @Module({
   imports: [
     PrismaModule,
     ConfigModule,
+
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -17,6 +19,21 @@ import { JwtModule } from '@nestjs/jwt';
         signOptions: { expiresIn: '20m' },
       })
     }),
+    
+    MailerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        transport: {
+          host: configService.get<string>('MAIL_HOST'),
+          auth:{
+            user: configService.get<string>('MAIL_USER'),
+            pass: configService.get<string>('MAIL_PASSWORD')
+          }
+        }
+      })
+    }),
+
   ],
   controllers: [ViModuleController],
   providers: [ViModuleService],
