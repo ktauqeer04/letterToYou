@@ -1,29 +1,58 @@
 import { Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class ViModuleService{
-    constructor(private readonly prisma: PrismaService) {}
+    constructor(
+        private readonly prisma: PrismaService,
+        private readonly jwtService: JwtService
+    ) {}
 
-    async create(letterDto: any): Promise<Boolean> {
+    async create(payload: any) {
 
         try {
             const createLetter = await this.prisma.letter.create({
-            data: letterDto
-        })
+                data: payload
+            });
 
-            console.log("Letter created with data:", letterDto);
-            return createLetter? true : false;
+            const token = this.jwtService.sign({ 
+                uuid: createLetter.uuid,
+                email: createLetter.email,
+             });
+
+             console.log(token);
+
+            return token;
         } catch (error: any) {
-            if (error.code === 'P2002') {
-                console.error("Email already exists:", letterDto.email);
-            } else {
-                console.log("Error creating letter:", error);
-            }
-            return false;
+            console.error('Error creating letter:', error.message);
+            return "false";
         }
     }
 
+    async VerifyToken(payload: any): Promise<Boolean> {
 
+        try {
 
+            const token = payload.token;
+            const decoded = this.jwtService.verify(token);
+
+            if(decoded){
+                const letter = await this.prisma.letter.update({
+                    where: {
+                        uuid: decoded.uuid
+                    },
+                    data: {
+                        isVerified: true
+                    }
+                });
+                return true;
+            }
+
+            return false;
+        } catch (error: any) {
+            console.error('Error verifying token:', error.message);
+            return false;
+        }
+    }
 }

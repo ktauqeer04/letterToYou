@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Param, Post, Query, Res } from '@nestjs/common';
 import { ViModuleService } from './vi_module.service';
 import { CreateLetterDto } from './dto/vi_module.dto';
 
@@ -10,14 +10,28 @@ export class ViModuleController {
 
     
     @Post()
-    create(@Body() letterDto: CreateLetterDto): Promise<Boolean>{
-        return this.viModuleService.create(letterDto);
-        
+    async create(
+        @Body() letterDto: CreateLetterDto,
+        @Res() res: any
+    ){
+        const response = await this.viModuleService.create(letterDto);
+        return res.status(HttpStatus.CREATED).json({
+            message: 'Letter created successfully',
+            data: response
+        });
+
     }
 
-    @Get()
-    findAll(): string {
-        return 'This action returns all letters';
+    @Get(':token')
+    async VerifyToken(
+        @Param('token') token: string,
+        @Res() res: any
+    ){
+        const response = await this.viModuleService.VerifyToken({ token });
+        return res.status(HttpStatus.OK).json({
+            message: 'Token verification',
+            data: response
+        }); 
     }
 
 }
