@@ -46,7 +46,7 @@ export class ViModuleService{
         try {
 
             const token = payload.token;
-            const decoded = this.jwtService.verify(token);
+            const decoded = await this.jwtService.verify(token);
 
             if(decoded){
                 await this.prisma.letter.update({

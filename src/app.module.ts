@@ -7,9 +7,10 @@ import { ViModuleService } from './vi_module/vi_module.service';
 import { ViModuleModule } from './vi_module/vi_module.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { WorkerModule } from './worker/worker.module';
 
 @Module({
-  imports: [PrismaModule, ViModuleModule, JwtModule],
+  imports: [PrismaModule, ViModuleModule, JwtModule, WorkerModule],
   controllers: [AppController],
   providers: [AppService, PrismaService, ViModuleService, ConfigService],
 })
