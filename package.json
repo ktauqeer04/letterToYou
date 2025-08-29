@@ -29,7 +29,7 @@
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/schedule": "^6.0.0",
     "@prisma/client": "^6.13.0",
-    "bullmq": "^5.56.9",
+    "bullmq": "^5.58.2",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",
     "nodemailer": "^7.0.5",

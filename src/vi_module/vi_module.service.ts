@@ -6,6 +6,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class ViModuleService{
+
     constructor(
         private readonly prisma: PrismaService,
         private readonly jwtService: JwtService,
@@ -35,6 +36,7 @@ export class ViModuleService{
             }); 
 
             return token;
+
         } catch (error: any) {
             console.error('Error creating letter:', error.message);
             return "false";
@@ -61,6 +63,7 @@ export class ViModuleService{
             }
 
             return false;
+            
         } catch (error: any) {
             console.error('Error verifying token:', error.message);
             return false;
