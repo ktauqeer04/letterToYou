@@ -9,14 +9,15 @@ datasource db {
 
 
 model Letter {
-  uuid        String      @id @default(uuid())
-  email       String   
-  content     String
-  isVerified  Boolean     @default(false)
-  sendDate    DateTime
-  status      Status      @default(PENDING)
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  idUuid        String      @id @default(uuid())
+  hashedUuid    String      @unique
+  email         String   
+  content       String
+  isVerified    Boolean     @default(false)
+  sendDate      DateTime
+  status        Status      @default(PENDING)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
 }
 
 enum Status {

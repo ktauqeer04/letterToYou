@@ -31,7 +31,7 @@ export class QueueConsumerService extends WorkerHost{
         });
 
         await this.prisma.letter.update({
-            where: { uuid: uuid },
+            where: { idUuid: uuid },
             data: { status: 'SENT' },
         });
 

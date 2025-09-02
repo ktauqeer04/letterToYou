@@ -3,6 +3,9 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/prisma/prisma.service';
+import * as bcrypt from 'bcrypt';
+import { createHash } from 'node:crypto';
+
 
 @Injectable()
 export class ViModuleService{
@@ -18,15 +21,19 @@ export class ViModuleService{
 
         try {
 
+            const token = createHash('sha256').update(payload.email).digest('hex');
+
+            payload.hashedUuid = token;
+
             const createLetter = await this.prisma.letter.create({
                 data: payload
             });
 
-            const token = this.jwtService.sign({ 
-                uuid: createLetter.uuid
-             });
+            // const token = await bcrypt.hash(createLetter.idUuid, 10);
 
-            const url = `${this.configService.get<string>('DEV_URL')}/vi-module/${token}`;
+            // const token = createHash('sha256').update(createLetter.idUuid).digest('hex');
+
+            const url = `${this.configService.get<string>('DEV_URL')}?token=${token}`;
 
             await this.emailService.sendMail({
                 to: payload.email,
@@ -35,7 +42,7 @@ export class ViModuleService{
                 text: `Please verify your letter by clicking on the link below: ${url}`,
             }); 
 
-            return token;
+            return url;
 
         } catch (error: any) {
             console.error('Error creating letter:', error.message);
@@ -43,30 +50,30 @@ export class ViModuleService{
         }
     }
 
-    async VerifyToken(payload: any): Promise<Boolean> {
+    // async VerifyToken(payload: any): Promise<Boolean> {
 
-        try {
+    //     try {
 
-            const token = payload.token;
-            const decoded = await this.jwtService.verify(token);
+    //         const token = payload.token;
+    //         const decoded = await this.jwtService.verify(token);
 
-            if(decoded){
-                await this.prisma.letter.update({
-                    where: {
-                        uuid: decoded.uuid
-                    },
-                    data: {
-                        isVerified: true
-                    }
-                });
-                return true;
-            }
+    //         if(decoded){
+    //             await this.prisma.letter.update({
+    //                 where: {
+    //                     idUuid: decoded.idUuid
+    //                 },
+    //                 data: {
+    //                     isVerified: true
+    //                 }
+    //             });
+    //             return true;
+    //         }
 
-            return false;
+    //         return false;
             
-        } catch (error: any) {
-            console.error('Error verifying token:', error.message);
-            return false;
-        }
-    }
+    //     } catch (error: any) {
+    //         console.error('Error verifying token:', error.message);
+    //         return false;
+    //     }
+    // }
 }
