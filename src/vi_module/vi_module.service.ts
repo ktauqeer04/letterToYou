@@ -3,7 +3,6 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/prisma/prisma.service';
-import * as bcrypt from 'bcrypt';
 import { createHash } from 'node:crypto';
 
 
@@ -21,19 +20,17 @@ export class ViModuleService{
 
         try {
 
-            const token = createHash('sha256').update(payload.email).digest('hex');
+            const jwtToken = this.jwtService.sign({ email: payload.email });
+
+            const token = createHash('sha256').update(jwtToken).digest('hex');
 
             payload.hashedUuid = token;
 
-            const createLetter = await this.prisma.letter.create({
+            await this.prisma.letter.create({
                 data: payload
             });
 
-            // const token = await bcrypt.hash(createLetter.idUuid, 10);
-
-            // const token = createHash('sha256').update(createLetter.idUuid).digest('hex');
-
-            const url = `${this.configService.get<string>('DEV_URL')}?token=${token}`;
+            const url = `${this.configService.get<string>('DEV_URL')}/email-verify?token=${token}`;
 
             await this.emailService.sendMail({
                 to: payload.email,

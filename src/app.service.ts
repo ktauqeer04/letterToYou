@@ -8,54 +8,28 @@ export class AppService {
     private readonly prisma: PrismaService,
   ){}
 
-  async VerifyToken(payload: any): Promise<Boolean> {
+  async VerifyToken(payload: any): Promise<{}> {
 
       try {
 
-          const token = payload.token;
+            const token = payload.token;
+            const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000);
 
 
-          await this.prisma.$transaction(async (tx) => {
-            const currentDate = Date.now();
-            
-            const existingLetter = await tx.letter.findUnique({
-              where: { hashedUuid: token },
+            const updated = await this.prisma.letter.updateMany({
+              where: {
+                hashedUuid: token,
+                createdAt: { gte: cutoff },
+              },
+              data: { isVerified: true },
             });
 
-            if(currentDate - existingLetter.createdAt )
-
-            if (!existingLetter) {
-
+            if (updated.count === 0) {
+              return { flag: false, message: 'Invalid or expired token' };
             }
 
-          })
-          const twentyFourHoursAgo = new Date();
-          twentyFourHoursAgo.setHours(twentyFourHoursAgo.getHours() - 24);
 
-
-          const letter = await this.prisma.letter.update({
-            where: { 
-              hashedUuid: token,
-
-            },
-            data: { isVerified: true },
-          })
-
-          // const decoded = await this.jwtService.verify(token);
-
-          // if(decoded){
-          //     await this.prisma.letter.update({
-          //         where: {
-          //             idUuid: decoded.idUuid
-          //         },
-          //         data: {
-          //             isVerified: true
-          //         }
-          //     });
-          //     return true;
-          // }
-
-          return false;
+            return { flag: true, message: 'Token verified successfully' };
           
       } catch (error: any) {
           console.error('Error verifying token:', error.message);

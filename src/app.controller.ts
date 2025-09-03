@@ -1,19 +1,32 @@
-import { Controller, Get, Param, Res } from '@nestjs/common';
+import { Controller, Get, HttpStatus, Param, Query, Res } from '@nestjs/common';
 import { AppService } from './app.service';
 
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-    @Get(':token')
+    @Get('email-verify')
     async VerifyToken(
-        @Param('token') token: string,
+        @Query('token') token: string,
         @Res() res: any
     ){
-        const response = await this.viModuleService.VerifyToken({ token });
-        return res.status(HttpStatus.OK).json({
-            message: 'Token verification',
-            data: response
-        }); 
+
+        try {
+
+            const response = await this.appService.VerifyToken({ token });
+
+            return res.status(HttpStatus.OK).json({
+                message: 'Token verification',
+                data: response
+            });
+
+        } catch (error) {
+            console.error('Error verifying token:', error);
+            return res.status(HttpStatus.BAD_REQUEST).json({
+                message: 'Token verification failed',
+                error: error,
+            });
+        }
+
     }
 }
