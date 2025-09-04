@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { WorkerController } from './worker.controller';
-import { WorkerService } from './worker.service';
+import { WorkerService } from './worker-pub.service';
 import { ScheduleModule } from '@nestjs/schedule';
 import { BullModule } from '@nestjs/bullmq';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { QueueConsumerService } from './queue-consumer.service';
+import { QueueConsumerService } from './worker-sub.service';
 
 @Module({
   imports: [

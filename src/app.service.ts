@@ -15,7 +15,6 @@ export class AppService {
             const token = payload.token;
             const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000);
 
-
             const updated = await this.prisma.letter.updateMany({
               where: {
                 hashedUuid: token,

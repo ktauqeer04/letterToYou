@@ -20,57 +20,91 @@ export class ViModuleService{
 
         try {
 
-            const jwtToken = this.jwtService.sign({ email: payload.email });
-
-            const token = createHash('sha256').update(jwtToken).digest('hex');
-
-            payload.hashedUuid = token;
-
-            await this.prisma.letter.create({
-                data: payload
+            const findExistingEmail = await this.prisma.letter.findUnique({
+                where: {
+                    email: payload.email
+                }
             });
 
-            const url = `${this.configService.get<string>('DEV_URL')}/email-verify?token=${token}`;
+            if(!findExistingEmail){
+                
+                const jwtToken = this.jwtService.sign({ email: payload.email });
 
-            await this.emailService.sendMail({
-                to: payload.email,
-                subject: 'Verify your letter',
-                template: './verify',
-                text: `Please verify your letter by clicking on the link below: ${url}`,
-            }); 
+                const token = createHash('sha256').update(jwtToken).digest('hex');
 
-            return url;
+
+                const letterPayload = await this.prisma.letter.create({
+                    data: {
+                        hashedUuid: token,
+                        email: payload.email,
+                        content: {
+                            create: { 
+                                content: payload.content,
+                                sendDate: payload.sendDate
+                            }
+                        },
+                    }
+                });
+
+                console.log(letterPayload);
+
+                const url = `${this.configService.get<string>('DEV_URL')}/email-verify?token=${token}`;
+
+                await this.emailService.sendMail({
+                    to: payload.email,
+                    subject: 'Verify your letter',
+                    template: './verify',
+                    text: `Please verify your letter by clicking on the link below: ${url}`,
+                }); 
+
+                return url;
+
+            }
+
+            if(!findExistingEmail.isVerified){
+
+                const url = `${this.configService.get<string>('DEV_URL')}/email-verify?token=${findExistingEmail.hashedUuid}`;
+
+                await this.prisma.content.create({
+                    data: {
+                        content: payload.content,
+                        sendDate: payload.sendDate,
+                        letterId: findExistingEmail.idUuid
+                    }
+                });
+
+                await this.emailService.sendMail({
+                    to: payload.email,
+                    subject: 'Verify your letter',
+                    template: './verify',
+                    text: `Please verify your letter by clicking on the link below: ${url}`,
+                }); 
+
+                return url;
+
+            }
+
+            await this.prisma.content.create({
+                data: {
+                    content: payload.content,
+                    sendDate: payload.sendDate,
+                    letterId: findExistingEmail.idUuid
+                }
+            });
+
+            return "created";
 
         } catch (error: any) {
+
+            if(error.code === 'P2002'){
+                // console.log(letterPayload)
+                return "duplicate";
+            }
+
             console.error('Error creating letter:', error.message);
             return "false";
+
         }
     }
 
-    // async VerifyToken(payload: any): Promise<Boolean> {
-
-    //     try {
-
-    //         const token = payload.token;
-    //         const decoded = await this.jwtService.verify(token);
-
-    //         if(decoded){
-    //             await this.prisma.letter.update({
-    //                 where: {
-    //                     idUuid: decoded.idUuid
-    //                 },
-    //                 data: {
-    //                     isVerified: true
-    //                 }
-    //             });
-    //             return true;
-    //         }
-
-    //         return false;
-            
-    //     } catch (error: any) {
-    //         console.error('Error verifying token:', error.message);
-    //         return false;
-    //     }
-    // }
 }

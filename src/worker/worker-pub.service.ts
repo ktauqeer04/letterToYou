@@ -11,7 +11,6 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class WorkerService {
     constructor(
         @InjectQueue('send-bulk-email') private readonly emailQueue: Queue,
-        private readonly configService: ConfigService,
         private readonly prisma: PrismaService
     ) {}
 
@@ -20,20 +19,21 @@ export class WorkerService {
 
         console.log('Cron job running every 10 seconds');
         
-        const verifiedLetters = await this.prisma.letter.updateManyAndReturn({
+        const verifiedLetters = await this.prisma.content.findMany({
             where: {
-                isVerified: true,
                 status: 'PENDING',
-                sendDate:{
-                    lte: new Date()
+                sendDate: { lte: new Date() },
+                letter: {
+                    isVerified: true
                 }
             },
-            data:{
-                status: 'SENT'
+            include: {
+                letter: true
             }
         });
 
-        console.log(verifiedLetters)
+        console.log(verifiedLetters);
+        
 
         
         // for(const letter of verifiedLetters){
