@@ -5,11 +5,14 @@ import { PrismaModule } from '../prisma/prisma.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { MailerModule } from '@nestjs-modules/mailer';
+import { WorkerModule } from 'src/worker/worker.module';
+import { QueueConsumerService } from './sub/vi_module.sub';
 
 @Module({
   imports: [
     PrismaModule,
     ConfigModule,
+    WorkerModule,
 
     JwtModule.registerAsync({
       imports: [ConfigModule],
@@ -36,6 +39,6 @@ import { MailerModule } from '@nestjs-modules/mailer';
 
   ],
   controllers: [ViModuleController],
-  providers: [ViModuleService],
+  providers: [ViModuleService, QueueConsumerService],
 })
 export class ViModuleModule {}

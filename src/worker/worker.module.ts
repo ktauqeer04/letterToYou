@@ -28,5 +28,6 @@ import { QueueConsumerService } from './worker-sub.service';
   ],
   controllers: [WorkerController],
   providers: [WorkerService, ConfigService, PrismaService, QueueConsumerService],
+  exports: [BullModule],
 })
 export class WorkerModule {}
