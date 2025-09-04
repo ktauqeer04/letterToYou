@@ -17,7 +17,7 @@ export class QueueConsumerService extends WorkerHost{
 
   async process(job: Job): Promise<any> {
     
-    const { email, content, uuid } = job.data;
+    const { email, content, Iduuid } = job.data;
     console.log("job data:", job.data);
 
     // console.log(`Processing job ${job.id} for email: ${email}`);
@@ -31,7 +31,7 @@ export class QueueConsumerService extends WorkerHost{
         });
 
         await this.prisma.content.update({
-            where: { idUuid: uuid },
+            where: { idUuid: Iduuid },
             data: { status: 'SENT' },
         });
 

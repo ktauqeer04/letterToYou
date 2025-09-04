@@ -17,7 +17,7 @@ export class WorkerService {
     @Cron(CronExpression.EVERY_30_SECONDS)
     async processTask(){
 
-        console.log('Cron job running every 10 seconds');
+        console.log('Cron job running every 30 seconds');
         
         const verifiedLetters = await this.prisma.content.findMany({
             where: {
@@ -34,17 +34,17 @@ export class WorkerService {
 
         console.log(verifiedLetters);
         
-
-        
-        // for(const letter of verifiedLetters){
-        //     await this.emailQueue.add('sendEmail', letter, {
-        //         delay: 5000,  // Delay for 5 seconds
-        //         attempts: 3,  // Retry 3 times on failure
-        //         backoff: { type: 'exponential', delay: 2000 },  // Exponential backoff with 2-second delay
-        //         removeOnComplete: true,  // Remove after completion
-        //     });
-        // }
-
+        for(const letter of verifiedLetters){
+            await this.emailQueue.add('sendEmail', {
+                email: letter.letter.email,
+                content: letter.content,
+                Iduuid: letter.idUuid
+                 }, {
+                delay: 5000,  // Delay for 5 seconds
+                attempts: 3,  // Retry 3 times on failure
+                backoff: { type: 'exponential', delay: 2000 },  // Exponential backoff with 2-second delay
+                removeOnComplete: true,  // Remove after completion
+            });
+        }
     }
-
 }
