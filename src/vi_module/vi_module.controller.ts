@@ -16,24 +16,17 @@ export class ViModuleController {
         @Body() letterDto: CreateLetterDto,
         @Res() res: any
     ){
-        const response = await this.viModuleService.create(letterDto);
-        return res.status(HttpStatus.CREATED).json({
-            message: 'Letter created successfully',
-            data: response
-        });
+
+        try {
+            const response = await this.viModuleService.create(letterDto);
+            return res.status(HttpStatus.CREATED).json({
+                message: 'Letter created successfully',
+                data: response
+            });
+        } catch (error) {
+            
+        }
 
     }
-
-    // @Get(':token')
-    // async VerifyToken(
-    //     @Param('token') token: string,
-    //     @Res() res: any
-    // ){
-    //     const response = await this.viModuleService.VerifyToken({ token });
-    //     return res.status(HttpStatus.OK).json({
-    //         message: 'Token verification',
-    //         data: response
-    //     }); 
-    // }
 
 }

@@ -63,13 +63,6 @@ export class ViModuleService{
                     removeOnComplete: true, 
                 })
 
-                // await this.emailService.sendMail({
-                //     to: payload.email,
-                //     subject: 'Verify your letter',
-                //     template: './verify',
-                //     text: `Please verify your letter by clicking on the link below: ${url}`,
-                // }); 
-
                 return url;
 
             }
@@ -97,13 +90,6 @@ export class ViModuleService{
                     removeOnComplete: true, 
                 })
 
-                // await this.emailService.sendMail({
-                //     to: payload.email,
-                //     subject: 'Verify your letter',
-                //     template: './verify',
-                //     text: `Please verify your letter by clicking on the link below: ${url}`,
-                // }); 
-
                 return url;
 
             }
@@ -121,7 +107,6 @@ export class ViModuleService{
         } catch (error: any) {
 
             if(error.code === 'P2002'){
-                // console.log(letterPayload)
                 return "duplicate";
             }
 
