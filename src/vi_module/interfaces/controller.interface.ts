@@ -1,10 +1,6 @@
-export interface responseI <T>{
-    success: boolean,
-    message: string,
-    data: T,
-    error?: {
-        message: string,
-        details?: any
-    }
+import { responseSI } from "./service.interface"
+
+export interface responseCI<T> extends responseSI<T>{
+    status?: number
 }
 

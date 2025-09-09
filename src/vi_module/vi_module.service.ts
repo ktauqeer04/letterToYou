@@ -6,6 +6,8 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { createHash } from 'node:crypto';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
+import { responseSI } from './interfaces/service.interface';
+import { Letter } from '@prisma/client';
 
 
 @Injectable()
@@ -19,7 +21,7 @@ export class ViModuleService{
         private readonly configService: ConfigService
     ) {}
 
-    async create(payload: any) {
+    async create(payload: any) : Promise<responseSI<Letter>>{
 
         try {
 
@@ -48,7 +50,7 @@ export class ViModuleService{
                     }
                 });
 
-                console.log(letterPayload);
+                // console.log(letterPayload);
 
                 const url = `${this.configService.get<string>('DEV_URL')}/email-verify?token=${token}`;
 
@@ -63,7 +65,11 @@ export class ViModuleService{
                     removeOnComplete: true, 
                 })
 
-                return url;
+                return {
+                    success: true,
+                    message: 'Letter created and verification email queued',
+                    data: letterPayload
+                }
 
             }
 
@@ -90,7 +96,12 @@ export class ViModuleService{
                     removeOnComplete: true, 
                 })
 
-                return url;
+                // return url;
+                return {
+                    success: true,
+                    message: 'Letter content added and verification email re-queued',
+                    data: findExistingEmail
+                }
 
             }
 
@@ -102,16 +113,37 @@ export class ViModuleService{
                 }
             });
 
-            return "created";
-
-        } catch (error: any) {
-
-            if(error.code === 'P2002'){
-                return "duplicate";
+            // return "created";
+            return {
+                success: true,
+                message: 'Letter content added',
+                data: findExistingEmail
             }
 
-            console.error('Error creating letter:', error.message);
-            return "false";
+        } catch (error: any){
+
+            if(error.code === 'P2002'){
+                // return "duplicate";
+                return {
+                    success: false,
+                    message: 'Duplicate entry error',
+                    error: {
+                        message: error.message,
+                        details: error.meta
+                    }
+                }
+            }
+
+            // console.error('Error creating letter:', error.message);
+
+            return {
+                success: false, 
+                message: 'Error creating letter',
+                error: {
+                    message: error.message,
+                    details: error.meta
+                }
+            }
 
         }
     }
