@@ -16,12 +16,12 @@ export class WorkerService {
     @Cron(CronExpression.EVERY_30_SECONDS)
     async processTask(){
 
-        console.log('Cron job running every 30 seconds');
+        console.log('Cron job running every 30 seconds with current time:', new Date().toISOString());
         
         const verifiedLetters = await this.prisma.content.findMany({
             where: {
                 status: 'PENDING',
-                sendDate: { gte: new Date() },
+                sendDate: { lte: new Date() },
                 letter: {
                     isVerified: true
                 }
