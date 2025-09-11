@@ -21,7 +21,7 @@ export class WorkerService {
         const verifiedLetters = await this.prisma.content.findMany({
             where: {
                 status: 'PENDING',
-                sendDate: { lte: new Date() },
+                sendDate: { gte: new Date() },
                 letter: {
                     isVerified: true
                 }

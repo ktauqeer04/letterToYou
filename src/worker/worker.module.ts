@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { WorkerController } from './worker.controller';
 import { WorkerService } from './worker-pub.service';
 import { ScheduleModule } from '@nestjs/schedule';
 import { BullModule } from '@nestjs/bullmq';
@@ -26,7 +25,6 @@ import { QueueConsumerService } from './worker-sub.service';
     }), 
 
   ],
-  controllers: [WorkerController],
   providers: [WorkerService, ConfigService, PrismaService, QueueConsumerService],
   exports: [BullModule],
 })

@@ -15,36 +15,89 @@ export class QueueConsumerService extends WorkerHost{
     super();
   }
 
-  async process(job: Job): Promise<any> {
-    
-    const { email, content, Iduuid } = job.data;
-    console.log("job data:", job.data);
 
-    // console.log(`Processing job ${job.id} for email: ${email}`);
-    
+  private async processEmailVerification(job: Job): Promise<void> {
+
     try {
-        
-        await this.emailService.sendMail({
-            to: email,
-            subject: 'Letter to You',
-            text: content,
-        });
+      
+      const { to, url, idUuid } = job.data;
+      console.log("job data:", job.data);
 
-        await this.prisma.content.update({
-            where: { idUuid: Iduuid },
-            data: { status: 'SENT' },
-        });
+      await this.emailService.sendMail({
+          to: to,
+          subject: 'Verify your letter',
+          template: './verify',
+          text: `Please verify your letter by clicking on the link below: ${url}`,
+      });
 
+      await this.prisma.letter.update({
+          where: { idUuid: idUuid },
+          data: { isVerified: true },
+      });
 
     } catch (error) {
+
+      console.error(`Failed to process email verification job ${job.id}:`, error);
+      throw new Error(`Failed to process email verification job ${job.id}`);
+
+    }
+
+  }  
+
+  private async processSendEmail(job: Job): Promise<void> {
+
+    try {
+      
+      console.log("job data:", job.data);
+
+      const { email, content, Iduuid } = job.data;
+
+      await this.emailService.sendMail({
+          to: email,
+          subject: 'Letter to You',
+          text: content,
+      });
+
+      await this.prisma.content.update({
+          where: { idUuid: Iduuid },
+          data: { status: 'SENT' },
+      });
+
+    } catch (error) {
+      
+      console.error(`Failed to process send email job ${job.id}:`, error);
+      throw new Error(`Failed to process send email job ${job.id}`);  
+
+    }
+
+  }
+
+  async process(job: Job): Promise<any> {
+    
+    // const { to, url, idUuid } = job.data;
+    // console.log("job data:", job.data);
+
+    // console.log(`Processing job ${job.id} for url: ${url}`);
+
+    try {
+      
+      console.log(`Processing job ${job.id} of type ${job.name}`);
+      switch (job.name) {
+
+        case 'verification-email': 
+          await this.processEmailVerification(job); 
+          break;
+
+        case 'sendEmail': 
+          await this.processSendEmail(job); 
+          break;
         
-        // await this.prisma.letter.update({
-        //     where: { uuid: uuid },
-        //     data: { status: 'FAILED' },
-        // });
+        
+      }
 
-        console.error(`Failed to send email to ${email}:`, error);
-
+    } catch (error) {
+      console.error(`Failed to process job ${job.id}:`, error);
+      throw new Error(`Failed to process job ${job.id}`);
     }
 
   }

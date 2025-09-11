@@ -31,8 +31,8 @@ export class ViModuleController {
         } catch (error) {
             return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
                 success: false,
-                message: 'An unexpected error occurred',
-                error: { message: error.message },
+                message: 'Internal server error',
+                error: { message: error },
             });
         }
     }

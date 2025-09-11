@@ -6,7 +6,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { WorkerModule } from 'src/worker/worker.module';
-import { QueueConsumerService } from './sub/vi_module.sub';
 
 @Module({
   imports: [
@@ -39,6 +38,6 @@ import { QueueConsumerService } from './sub/vi_module.sub';
 
   ],
   controllers: [ViModuleController],
-  providers: [ViModuleService, QueueConsumerService],
+  providers: [ViModuleService],
 })
 export class ViModuleModule {}
