@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from './prisma/prisma.service';
+import { responseSI } from './interfaces/service.interface';
+import { Letter } from '@prisma/client';
 
 @Injectable()
 export class AppService {
@@ -8,14 +10,15 @@ export class AppService {
     private readonly prisma: PrismaService,
   ){}
 
-  async VerifyToken(payload: any): Promise<{}> {
+  async VerifyToken(payload: any): Promise<responseSI<Letter>> {
 
       try {
 
             const token = payload.token;
-            const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000);
+            // const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000);
+            const cutoff = new Date(Date.now() - 4 * 60 * 1000);
 
-            const updated = await this.prisma.letter.updateMany({
+            const updatedData = await this.prisma.letter.updateMany({
               where: {
                 hashedUuid: token,
                 createdAt: { gte: cutoff },
@@ -23,16 +26,28 @@ export class AppService {
               data: { isVerified: true },
             });
 
-            if (updated.count === 0) {
-              return { flag: false, message: 'Invalid or expired token' };
+            if(updatedData.count === 0){
+              throw new Error('Token Expired');
             }
 
+            console.log('Updated Data:', updatedData);
 
-            return { flag: true, message: 'Token verified successfully' };
+            return {
+              success: true,
+              message: 'Email Verified Successfully',
+              data: updatedData[0]
+            }
+
           
       } catch (error: any) {
+
+          if (error.message === 'Token Expired') {
+            throw error;
+          }
+
           console.error('Error verifying token:', error.message);
-          return false;
+          throw new Error('Something went wrong in service layer');
+
       }
 
     }

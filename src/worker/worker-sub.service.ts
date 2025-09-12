@@ -30,11 +30,6 @@ export class QueueConsumerService extends WorkerHost{
           text: `Please verify your letter by clicking on the link below: ${url}`,
       });
 
-      await this.prisma.letter.update({
-          where: { idUuid: idUuid },
-          data: { isVerified: true },
-      });
-
     } catch (error) {
 
       console.error(`Failed to process email verification job ${job.id}:`, error);

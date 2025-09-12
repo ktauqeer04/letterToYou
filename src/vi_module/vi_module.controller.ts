@@ -1,7 +1,7 @@
 import { Body, Controller, HttpStatus, Post, Res } from '@nestjs/common';
 import { ViModuleService } from './vi_module.service';
 import { CreateLetterDto } from './dto/vi_module.dto';
-import { responseCI } from './interfaces/controller.interface';
+import { responseCI } from '../interfaces/controller.interface';
 
 @Controller('vi-module')
 export class ViModuleController {

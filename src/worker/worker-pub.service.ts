@@ -14,7 +14,7 @@ export class WorkerService {
     ) {}
 
     @Cron(CronExpression.EVERY_30_SECONDS)
-    async processTask(){
+    async processTask(): Promise<void>{
 
         console.log('Cron job running every 30 seconds with current time:', new Date().toISOString());
         

@@ -6,7 +6,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { createHash } from 'node:crypto';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
-import { responseSI } from './interfaces/service.interface';
+import { responseSI } from '../interfaces/service.interface';
 import { Letter } from '@prisma/client';
 
 
@@ -50,7 +50,7 @@ export class ViModuleService{
                     }
                 });
 
-                // console.log(letterPayload);
+                console.log(letterPayload);
 
                 const url = `${this.configService.get<string>('DEV_URL')}/email-verify?token=${token}`;
 
