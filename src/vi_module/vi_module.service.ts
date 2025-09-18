@@ -1,13 +1,13 @@
-import { MailerService } from '@nestjs-modules/mailer';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { createHash } from 'node:crypto';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
 import { responseSI } from '../interfaces/service.interface';
 import { Letter } from '@prisma/client';
+import { createPayload } from './interface/payload.interface';
 
 
 @Injectable()
@@ -17,11 +17,10 @@ export class ViModuleService{
         @InjectQueue('send-bulk-email') private readonly emailQueue: Queue,
         private readonly prisma: PrismaService,
         private readonly jwtService: JwtService,
-        private readonly emailService: MailerService,
         private readonly configService: ConfigService
     ) {}
 
-    async create(payload: any) : Promise<responseSI<Letter>>{
+    async create(payload: createPayload) : Promise<responseSI<Letter>>{
 
         try {
 
@@ -30,6 +29,8 @@ export class ViModuleService{
                     email: payload.email
                 }
             });
+
+            console.log(findExistingEmail);
 
             if(!findExistingEmail){
                 
@@ -123,7 +124,6 @@ export class ViModuleService{
         } catch (error: any){
 
             if(error.code === 'P2002'){
-                // return "duplicate";
                 return {
                     success: false,
                     message: 'Duplicate entry error',
