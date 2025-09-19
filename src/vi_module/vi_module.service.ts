@@ -82,7 +82,7 @@ export class ViModuleService{
                     data: {
                         content: payload.content,
                         sendDate: payload.sendDate,
-                        letterId: findExistingEmail.idUuid
+                        letterId: findExistingEmail.idUuid,
                     }
                 });
 

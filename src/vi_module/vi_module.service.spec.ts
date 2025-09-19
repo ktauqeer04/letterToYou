@@ -28,8 +28,12 @@ describe('viModuleService', () => {
       create: jest.fn() as any,
     },
     content: {
-      create: jest.fn() as any
+      create: jest.fn() as any,
     }
+  }
+
+  const jwtMock = {
+    sign: jest.fn() as any
   }
 
   const queueMock = {
@@ -51,9 +55,7 @@ describe('viModuleService', () => {
         },
         {
             provide: JwtService,
-            useValue: {
-              sign: jest.fn() as any
-            }
+            useValue: jwtMock
         },
         {
           provide: ConfigService,
@@ -71,6 +73,11 @@ describe('viModuleService', () => {
 
   });
 
+  afterEach(() => {
+    jest.restoreAllMocks();
+    jest.clearAllMocks();
+  })
+
   describe('create Functionn', () => {
 
     // three cases 
@@ -78,46 +85,90 @@ describe('viModuleService', () => {
     // 2. if an email already exists but not verified
     // 3. email doesn't exist
 
-    const payload = {
-      email : 'example@example.com',
-      content: 'This is a test content',
-      sendDate: new Date()
-    }
 
     it('should should create an email and send verification token if email does not exists', async () =>  {
 
-        (prismaMock.letter.findUnique).mockResolvedValue(payload.email);
+        const examplePayload = {
+          email: 'example@example.com',
+          content: "This is a test content",
+          sendDate: new Date()
+        };
 
-        (jwtService.sign as jest.Mock).mockReturnValue('signedJwtToken');
+        (prismaMock.letter.findUnique).mockResolvedValue(null);
+
+        (jwtMock.sign).mockReturnValue('example-jwt-token');
 
         const createdLetter = {
-          idUuid: 'random-generated-uuid',  
-          hashedUuid: 'hashed-token',
-          email: 'example@example.com',
+          idUuid: 'example-uuid',
+          hashedUuid: 'example-hashed-uuid',
+          email: examplePayload.email,
           isVerified: false,
-          createdAt: new Date(),
-          updatedAt: new Date()
-        }
+        };
 
-        prismaMock.letter.create.mockResolvedValue(createdLetter);
+        (prismaMock.letter.create).mockResolvedValue(createdLetter);
 
-        // queueMock.add.mockResolvedValue()
-
-        const res = await viModuleService.create(payload);
+        await viModuleService.create(examplePayload)
 
         expect(prismaMock.letter.findUnique).toHaveBeenCalledWith({
-          where: { email: payload.email } 
+          where: { email : examplePayload.email }
         });
 
-        expect(res.success).toBe(true);
-        // expect(res.message).toBe('Verification email sent. Please verify your email before creating content.');
-        // expect(res.data).toEqual(createdLetter);
+        expect(prismaMock.letter.create).toHaveBeenCalledWith({
+          data: {
+            hashedUuid: expect.any(String),
+            email: examplePayload.email,
+            content: {
+              create: {
+                content: examplePayload.content,
+                sendDate: examplePayload.sendDate
+              }
+            }
+          }
+        });
 
     })
 
-    // it('should send a verification token if an email exists but not verified', async () => {
+      it('should send a verification token if an email exists but not verified', async () => {
 
-    // })
+          const examplePayload = {
+            email: 'example@example.com',
+            content: "This is a test content",
+            sendDate: new Date()
+          };
+          
+          const existingLetter = {
+            idUuid: 'existing-example-uuid',
+            hashedUuid: 'existing-example-hashedUuid',
+            email: 'example@example.com',
+            isVerified: false,
+            content: []
+          };
+
+          (prismaMock.letter.findUnique).mockResolvedValue(existingLetter);
+
+          const insertData = {
+            content: examplePayload.content,
+            sendDate: examplePayload.sendDate,
+            letterId: existingLetter.idUuid
+          };
+
+          (prismaMock.content.create).mockResolvedValue(insertData);
+
+          const res = await viModuleService.create(examplePayload);
+
+          expect(prismaMock.letter.findUnique).toHaveBeenCalledWith({
+            where: { email : examplePayload.email}
+          });
+
+          expect(prismaMock.content.create).toHaveBeenCalledWith({
+            data: {
+              content: examplePayload.content,
+              sendDate: examplePayload.sendDate,
+              letterId: existingLetter.idUuid,
+            }
+          })
+
+      })
 
     // it('should create the content as email exists and verified', async () => {
 
