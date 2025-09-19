@@ -1,9 +1,12 @@
 
 # LetterToYou
 
-A brief description of what this project does 
+## Introduction
 
-## API's
+In July 2022, I discovered a webpage where you can send yourself a message into the future.  
+I was very Fascinated by it and I thought whoever made this was extremely genius. Now that I know how to make Applications, I thought about making one production level tool and this clicked my mind, this is the easiest thing I could make and people can use it. 
+
+## API Reference
 
 ### Create
 
