@@ -107,7 +107,22 @@ describe('viModuleService', () => {
 
         (prismaMock.letter.create).mockResolvedValue(createdLetter);
 
-        await viModuleService.create(examplePayload)
+        const tempUrl = `http://localhost:300/email-verify?token=${createdLetter.hashedUuid}`;
+
+        (queueMock.add).mockResolvedValue('verification-email', {
+          to: examplePayload.email,
+          url: tempUrl,
+          idUuid: createdLetter.idUuid
+        }, {
+          delay: 5000
+        })
+
+
+        // ---------------------------------------------
+
+        const response = await viModuleService.create(examplePayload)
+
+        // ---------------------------------------------
 
         expect(prismaMock.letter.findUnique).toHaveBeenCalledWith({
           where: { email : examplePayload.email }
@@ -126,6 +141,29 @@ describe('viModuleService', () => {
           }
         });
 
+        // console.log(queueMock.add.mock.calls);
+
+        expect(queueMock.add).toHaveBeenCalledTimes(1);
+
+        const queueArgs = queueMock.add.mock.calls[0];
+
+        expect(queueArgs[0]).toBe('verification-email');
+        expect(queueArgs[1].to).toBe(examplePayload.email);
+        expect(queueArgs[1].url).toContain('/email-verify?token=');
+        expect(queueArgs[1].idUuid).toBe(createdLetter.idUuid);
+        expect(queueArgs[2]).toEqual({
+          delay: 5000,
+          attempts: 3,
+          backoff: { type: 'exponential', delay: 2000 },
+          removeOnComplete: true,
+        });
+
+
+        expect(response.success).toBe(true);
+        expect(response.message).toBe('Letter created and verification email queued');
+        expect(response.data).toEqual(createdLetter);
+        
+
     })
 
       it('should send a verification token if an email exists but not verified', async () => {
@@ -136,25 +174,49 @@ describe('viModuleService', () => {
             sendDate: new Date()
           };
           
-          const existingLetter = {
+          // const existingLetter = {
+          //   idUuid: 'existing-example-uuid',
+          //   hashedUuid: 'existing-example-hashedUuid',
+          //   email: 'example@example.com',
+          //   isVerified: false,
+          //   content: []
+          // };
+
+          (prismaMock.letter.findUnique).mockResolvedValue({
+            isVerified: false,
             idUuid: 'existing-example-uuid',
             hashedUuid: 'existing-example-hashedUuid',
-            email: 'example@example.com',
-            isVerified: false,
-            content: []
-          };
-
-          (prismaMock.letter.findUnique).mockResolvedValue(existingLetter);
+            email: examplePayload.email,
+          });
 
           const insertData = {
             content: examplePayload.content,
             sendDate: examplePayload.sendDate,
-            letterId: existingLetter.idUuid
+            letterId: 'existing-example-uuid',
           };
 
           (prismaMock.content.create).mockResolvedValue(insertData);
 
-          const res = await viModuleService.create(examplePayload);
+          const tempUrl = `http://localhost:300/email-verify?token=${'existing-example-hashedUuid'}`;
+
+          (queueMock.add).mockResolvedValue('verification-email', 
+          {
+            to: examplePayload.email,
+            url: tempUrl,
+            idUuid: 'existing-example-uuid'
+          }, {
+            delay: 5000, 
+            attemps: 3, 
+            backoff: { type: 'exponential', delay: 2000 },
+            removeOnComplete: true,
+          });
+
+          // ---------------------------------------------
+
+          const response = await viModuleService.create(examplePayload);
+
+
+          // ---------------------------------------------
 
           expect(prismaMock.letter.findUnique).toHaveBeenCalledWith({
             where: { email : examplePayload.email}
@@ -164,15 +226,85 @@ describe('viModuleService', () => {
             data: {
               content: examplePayload.content,
               sendDate: examplePayload.sendDate,
-              letterId: existingLetter.idUuid,
+              letterId: 'existing-example-uuid',
             }
-          })
+          });
 
-      })
 
-    // it('should create the content as email exists and verified', async () => {
+          const queueArgs = queueMock.add.mock.calls[0];
 
-    // })
+          expect(queueArgs[0]).toBe('verification-email');
+          expect(queueArgs[1].to).toBe(examplePayload.email);
+          expect(queueArgs[1].url).toContain('/email-verify?token=');
+          expect(queueArgs[1].idUuid).toBe('existing-example-uuid');
+          expect(queueArgs[2]).toEqual({
+            delay: 5000,
+            attempts: 3,
+            backoff: { type: 'exponential', delay: 2000 },
+            removeOnComplete: true,
+          });
+
+
+          expect(response.success).toBe(true);          
+          expect(response.message).toBe('Letter content added and verification email re-queued');
+          expect(response.data).toEqual({
+            isVerified: false,
+            idUuid: 'existing-example-uuid',
+            hashedUuid: 'existing-example-hashedUuid',
+            email: examplePayload.email,  
+          });
+
+
+      });
+
+    it('should create the content as email exists and verified', async () => {
+
+      const examplePayload = {
+        email: 'example@example.com',
+        content: "This is a test content",
+        sendDate: new Date()
+      };
+
+      const findExistingEmail = {
+        isVerified: true,
+        idUuid: 'existing-example-uuid',
+        hashedUuid: 'existing-example-hashedUuid',
+        email: examplePayload.email,
+      };
+
+      (prismaMock.letter.findUnique).mockResolvedValue(findExistingEmail);
+
+      const contentData = {
+        content: examplePayload.content,
+        sendDate: examplePayload.sendDate,
+        letterId: findExistingEmail.idUuid
+      };
+
+      (prismaMock.content.create).mockResolvedValue(contentData);
+
+      // ----------------------------------------------------
+
+      const response = await viModuleService.create(examplePayload);
+
+      // ----------------------------------------------------
+
+      expect(prismaMock.letter.findUnique).toHaveBeenCalledWith({
+        where: { email : examplePayload.email} 
+      });
+
+      expect(prismaMock.content.create).toHaveBeenCalledWith({
+        data: {
+          content: examplePayload.content,
+          sendDate: examplePayload.sendDate,
+          letterId: findExistingEmail.idUuid
+        }
+      });
+
+      expect(response.success).toBe(true);
+      expect(response.message).toBe('Letter content added');
+      expect(response.data).toEqual(findExistingEmail);
+
+    })
 
   })
 

@@ -30,7 +30,7 @@ export class ViModuleService{
                 }
             });
 
-            console.log(findExistingEmail);
+            // console.log(findExistingEmail);
 
             if(!findExistingEmail){
                 
