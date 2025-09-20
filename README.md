@@ -20,3 +20,66 @@ This will do one of three things.
 
 - If the Provided Email Exists and is verified, The content is then inserted in Database. Following is the response payload
 
+#### REST Endpoint
+
+``` POST  /vi-module  ``` 
+
+Request 
+
+``` 
+
+{
+    "email": "example@example.com",
+    "content": "This is an Example Content you want to receive in future",
+    "sendDate": 2025-09-20T10:29:00.000Z
+}
+
+```
+
+Response 
+
+```
+201 Created
+{
+    "success": true,
+    "message": "Letter created Successfully",
+    "status": 201,
+    "data": LetterContentPayload,
+}
+
+```         
+
+
+### Verify Email 
+
+A verification Email will be sent to the User.    
+A token is read from query parameter, and the service layer checks whether this token is valid or expired.   
+* An Error is thrown if the token is Expired.
+* Updates the letter status to 'VERIFIED'. 
+
+
+#### REST Endpoint
+
+``` POST  /email-verify?token="A randomly generated token"  ``` 
+
+Request 
+
+``` 
+
+{
+    "token" = "A randomly generated Token"
+}
+
+```
+
+Response 
+
+```
+200 OK
+{
+    "success": true,
+    "message": "Token Verified Successfully",
+}
+
+```     
+

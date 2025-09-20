@@ -26,7 +26,7 @@ export class ViModuleController {
 
             return res.status(HttpStatus.CREATED).json({
                 success: true,
-                message: response.message,
+                message: "Letter created successfully",
                 data: response.data,
             });
         } catch (error) {

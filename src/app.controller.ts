@@ -18,8 +18,7 @@ export class AppController {
 
             return res.status(HttpStatus.OK).json({
                 success: true,
-                message: 'Token verification',
-                data: response
+                message: 'Token Verified Successfully',
             });
 
         } catch (error: any) {
