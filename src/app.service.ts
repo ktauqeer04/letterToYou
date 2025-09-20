@@ -10,11 +10,11 @@ export class AppService {
     private readonly prisma: PrismaService,
   ){}
 
-  async VerifyToken(payload: any): Promise<responseSI<Letter>> {
+  async VerifyToken(payload: any): Promise<responseSI<void>> {
 
       try {
 
-            const token = payload.token;
+            const token = payload.token as string;
             // const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000);
             console.log(new Date())
             const cutoff = new Date(Date.now() - 4 * 60 * 1000);
@@ -36,7 +36,6 @@ export class AppService {
             return {
               success: true,
               message: 'Email Verified Successfully',
-              data: updatedData[0]
             }
 
           
