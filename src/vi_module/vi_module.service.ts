@@ -76,15 +76,28 @@ export class ViModuleService{
 
             if(!findExistingEmail.isVerified){
 
-                const url = `${this.configService.get<string>('DEV_URL')}/email-verify?token=${findExistingEmail.hashedUuid}`;
+                const jwtToken = this.jwtService.sign({ email: payload.email });
 
-                await this.prisma.content.create({
+                const token = createHash('sha256').update(jwtToken).digest('hex');
+
+                const url = `${this.configService.get<string>('DEV_URL')}/email-verify?token=${token}`;
+
+
+                await this.prisma.letter.update({
+                    where: {
+                        idUuid: findExistingEmail.idUuid
+                    },
                     data: {
-                        content: payload.content,
-                        sendDate: payload.sendDate,
-                        letterId: findExistingEmail.idUuid,
+                        hashedUuid: token,
+                        email: payload.email,
+                        content: {
+                            create: {
+                                content: payload.content,
+                                sendDate: payload.sendDate
+                            }
+                        }
                     }
-                });
+                })
 
                 await this.emailQueue.add('verification-email', {
                     to: payload.email,
@@ -97,7 +110,7 @@ export class ViModuleService{
                     removeOnComplete: true, 
                 })
 
-                // return url;
+                
                 return {
                     success: true,
                     message: 'Letter content added and verification email re-queued',

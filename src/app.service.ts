@@ -22,7 +22,7 @@ export class AppService {
             const updatedData = await this.prisma.letter.updateMany({
               where: {
                 hashedUuid: token,
-                createdAt: { gte: cutoff },
+                updatedAt: { gte: cutoff },
               },
               data: { isVerified: true },
             });
