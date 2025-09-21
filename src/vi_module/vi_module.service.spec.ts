@@ -26,6 +26,7 @@ describe('viModuleService', () => {
     letter: {
       findUnique: jest.fn() as any,
       create: jest.fn() as any,
+      update: jest.fn() as any
     },
     content: {
       create: jest.fn() as any,
@@ -174,13 +175,6 @@ describe('viModuleService', () => {
             sendDate: new Date()
           };
           
-          // const existingLetter = {
-          //   idUuid: 'existing-example-uuid',
-          //   hashedUuid: 'existing-example-hashedUuid',
-          //   email: 'example@example.com',
-          //   isVerified: false,
-          //   content: []
-          // };
 
           (prismaMock.letter.findUnique).mockResolvedValue({
             isVerified: false,
@@ -189,15 +183,19 @@ describe('viModuleService', () => {
             email: examplePayload.email,
           });
 
-          const insertData = {
-            content: examplePayload.content,
-            sendDate: examplePayload.sendDate,
-            letterId: 'existing-example-uuid',
+          const token = 'example-token';
+
+          const resolvedData = {
+            idUuid: 'existing-example-uuid',
+            hashedUuid: token,
+            email: examplePayload.email,
+            content: []
           };
 
-          (prismaMock.content.create).mockResolvedValue(insertData);
 
-          const tempUrl = `http://localhost:300/email-verify?token=${'existing-example-hashedUuid'}`;
+          (prismaMock.letter.create).mockResolvedValue(resolvedData);
+
+          const tempUrl = `http://localhost:300/email-verify?token=${token}`;
 
           (queueMock.add).mockResolvedValue('verification-email', 
           {
@@ -222,11 +220,19 @@ describe('viModuleService', () => {
             where: { email : examplePayload.email}
           });
 
-          expect(prismaMock.content.create).toHaveBeenCalledWith({
+          expect(prismaMock.letter.update).toHaveBeenCalledWith({
+            where: {
+              idUuid: 'existing-example-uuid'
+            },
             data: {
-              content: examplePayload.content,
-              sendDate: examplePayload.sendDate,
-              letterId: 'existing-example-uuid',
+              hashedUuid: expect.any(String),
+              email: examplePayload.email,
+              content: {
+                create: {
+                  content: examplePayload.content,
+                  sendDate: examplePayload.sendDate
+                }
+              }
             }
           });
 

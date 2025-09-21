@@ -60,7 +60,7 @@ describe('app.service', () => {
             const updateData = {
                 where: {
                     hashedUuid: requestPayload.token,
-                    createdAt: { gte: expect.any(Date) },
+                    updatedAt: { gte: expect.any(Date) },
                 },
                 data: { isVerified: true },
             }
@@ -73,6 +73,7 @@ describe('app.service', () => {
 
         it('should throw token expired error', async () => {
 
+            
 
             const requestPayload = {
                 token: 'example-token'
