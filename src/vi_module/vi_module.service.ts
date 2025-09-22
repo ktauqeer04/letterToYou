@@ -79,7 +79,7 @@ export class ViModuleService{
                 const jwtToken = this.jwtService.sign({ email: payload.email });
 
                 const token = createHash('sha256').update(jwtToken).digest('hex');
-
+                
                 const url = `${this.configService.get<string>('DEV_URL')}/email-verify?token=${token}`;
 
 
@@ -136,17 +136,7 @@ export class ViModuleService{
 
         } catch (error: any){
 
-            if(error.code === 'P2002'){
-                return {
-                    success: false,
-                    message: 'Duplicate entry error',
-                    error: {
-                        message: error.message,
-                        details: error.meta
-                    }
-                }
-            }
-
+            
             // console.error('Error creating letter:', error.message);
 
             return {

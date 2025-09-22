@@ -5,7 +5,7 @@ import { PrismaModule } from '../prisma/prisma.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { MailerModule } from '@nestjs-modules/mailer';
-import { WorkerModule } from 'src/worker/worker.module';
+import { WorkerModule } from '../worker/worker.module';
 
 @Module({
   imports: [

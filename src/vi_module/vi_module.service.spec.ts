@@ -310,8 +310,8 @@ describe('viModuleService', () => {
       expect(response.message).toBe('Letter content added');
       expect(response.data).toEqual(findExistingEmail);
 
-    })
+    });
 
-  })
+  });
 
 });
