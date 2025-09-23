@@ -24,9 +24,18 @@ export class AppController {
         } catch (error: any) {
 
             console.log(error);
-            return res.status(HttpStatus.BAD_REQUEST).json({
+            if(error.message == 'Token Expired'){
+
+                return res.status(HttpStatus.BAD_REQUEST).json({
                 success: false,
                 message: 'Token verification failed',
+                error: error.message,
+            });
+
+            }
+            return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+                success: false,
+                message: 'Something went wrong',
                 error: error.message,
             });
 

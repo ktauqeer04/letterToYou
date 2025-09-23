@@ -15,6 +15,8 @@ export class ViModuleController {
 
         try {
 
+            console.log(letterDto);
+
             const response = await this.viModuleService.create(letterDto);
 
             if (!response.success) {
@@ -31,7 +33,7 @@ export class ViModuleController {
                 data: response.data,
             });
 
-        } catch (error) {
+        } catch (error: any) {
 
             return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
                 success: false,

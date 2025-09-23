@@ -37,7 +37,7 @@ export class WorkerService {
             await this.emailQueue.add('sendEmail', {
                 email: letter.letter.email,
                 content: letter.content,
-                Iduuid: letter.idUuid
+                idUuid: letter.idUuid
                  }, {
                 delay: 5000,  // Delay for 5 seconds
                 attempts: 3,  // Retry 3 times on failure

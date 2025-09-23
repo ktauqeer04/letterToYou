@@ -136,8 +136,6 @@ export class ViModuleService{
 
         } catch (error: any){
 
-            
-            // console.error('Error creating letter:', error.message);
 
             return {
                 success: false, 
