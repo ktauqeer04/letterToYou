@@ -16,11 +16,6 @@ export class ViModuleController {
 
         try {
 
-            console.log(typeof letterDto.sendDate);
-
-            console.log('Is Date instance?', letterDto.sendDate instanceof Date);
-
-
             const response = await this.viModuleService.create(letterDto);
 
             if (!response.success) {

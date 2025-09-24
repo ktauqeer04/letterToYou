@@ -13,6 +13,6 @@ export class CreateLetterDto {
 
     @IsDateString({}, { message: 'sendDate must be an ISO 8601 date string' })
     @IsNotEmpty()
-    sendDate: Date;
+    sendDate: Date | string;
     
 }

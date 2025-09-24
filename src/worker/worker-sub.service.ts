@@ -45,7 +45,7 @@ export class QueueConsumerService extends WorkerHost{
       
       console.log("job data:", job.data);
 
-      const { email, content, Iduuid } = job.data;
+      const { email, content, idUuid } = job.data;
 
       await this.emailService.sendMail({
           to: email,
@@ -54,7 +54,7 @@ export class QueueConsumerService extends WorkerHost{
       });
 
       await this.prisma.content.update({
-          where: { idUuid: Iduuid },
+          where: { idUuid: idUuid },
           data: { status: 'SENT' },
       });
 
