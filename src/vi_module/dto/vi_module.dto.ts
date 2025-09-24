@@ -1,5 +1,4 @@
-import { Transform, Type } from "class-transformer";
-import { IsDate, IsDateString, IsEmail, IsNotEmpty, IsString } from "class-validator";
+import { IsDateString, IsEmail, IsNotEmpty, IsString } from "class-validator";
 
 export class CreateLetterDto {
 
@@ -12,19 +11,7 @@ export class CreateLetterDto {
     @IsNotEmpty()
     content: string;
 
-    @Transform(({ value }) => {
-
-        if (typeof value === 'boolean') {
-            throw new Error('sendDate must be a valid date');
-        }
-        
-        if (typeof value === 'string') {
-            return new Date(value);
-        }
-        return value;
-    })
-    @Type(() => Date)
-    @IsDate({ message: 'sendDate must be a valid date' })
+    @IsDateString({}, { message: 'sendDate must be an ISO 8601 date string' })
     @IsNotEmpty()
     sendDate: Date;
     

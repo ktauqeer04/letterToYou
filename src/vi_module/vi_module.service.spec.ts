@@ -92,7 +92,7 @@ describe('viModuleService', () => {
         const examplePayload = {
           email: 'example@example.com',
           content: "This is a test content",
-          sendDate: new Date()
+          sendDate: "2025-09-10T00:00:00.000Z"
         };
 
         (prismaMock.letter.findUnique).mockResolvedValue(null);

@@ -24,13 +24,19 @@ export class ViModuleService{
 
         try {
 
+            console.log("here");
+            console.log(typeof payload.sendDate);
+            console.log('here in prisma');
+
+            // if(typeof payload.sendDate != "string"){
+            //     throw new Error('sendDate is invalid');
+            // }
+
             const findExistingEmail = await this.prisma.letter.findUnique({
                 where: {
                     email: payload.email
                 }
             });
-
-            // console.log(findExistingEmail);
 
             if(!findExistingEmail){
                 

@@ -2,6 +2,7 @@ import { Body, Controller, HttpStatus, Post, Res } from '@nestjs/common';
 import { ViModuleService } from './vi_module.service';
 import { CreateLetterDto } from './dto/vi_module.dto';
 import { responseCI } from '../interfaces/controller.interface';
+import { createPayload } from './interface/payload.interface';
 
 @Controller('vi-module')
 export class ViModuleController {
@@ -15,7 +16,10 @@ export class ViModuleController {
 
         try {
 
-            console.log(letterDto);
+            console.log(typeof letterDto.sendDate);
+
+            console.log('Is Date instance?', letterDto.sendDate instanceof Date);
+
 
             const response = await this.viModuleService.create(letterDto);
 

@@ -19,6 +19,10 @@ describe('VI_module Controller (e2e)', () => {
     await app.init();
   });
 
+  afterAll( async () => {
+    await app.close()
+  })
+
   const CREATE_URL = '/vi-module'
 
   it('should create and return a status code of 201', async () => {
@@ -41,12 +45,12 @@ describe('VI_module Controller (e2e)', () => {
   });
 
 
-  it('should throw an error for email constrain',   () => {
+  it('should throw an error for email constraint',   () => {
 
     const payload = {
       email: "tauqeer",
       content: "Hello from kratos",
-      sendDate: "2025-09-20T07:55:00.000Z"
+      sendDate: false
     }
 
     return request(app.getHttpServer())
@@ -56,6 +60,45 @@ describe('VI_module Controller (e2e)', () => {
       .expect(({ body }) => {
         expect(body.success).toBe(false)
         expect(body.message).toBe('Invalid inputs')
+    });
+
+  })
+
+  it('should throw an error for content constraint',   () => {
+
+    const payload = {
+      email: "tauqeer@example.com",
+      content: 4,
+      sendDate: false
+    }
+
+    return request(app.getHttpServer())
+      .post(CREATE_URL)
+      .send(payload)
+      .expect(400)
+      .expect(({ body }) => {
+        expect(body.success).toBe(false)
+        expect(body.message).toBe('Invalid inputs')
+        expect(body.error.message).toBe('content must be a string')
+    });
+
+  })
+
+  it('should throw an error for date constraint',   () => {
+
+    const payload = {
+      email: "tauqeer@example.com",
+      content: "Hello from kratos",
+      sendDate: false
+    }
+
+    return request(app.getHttpServer())
+      .post(CREATE_URL)
+      .send(payload)
+      .expect(400)
+      .expect(({ body }) => {
+        expect(body.success).toBe(false)
+        expect(body.error.message).toBe('sendDate is invalid')
     });
 
   })

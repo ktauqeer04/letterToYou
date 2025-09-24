@@ -7,7 +7,9 @@ import { ValidationExceptionFilter } from './pipes/custom-validation';
 async function bootstrap() {
 
   const app = await NestFactory.create(AppModule);
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(new ValidationPipe({ 
+    forbidUnknownValues: true,
+   }));
   app.useGlobalFilters(new ValidationExceptionFilter());
   await app.listen(process.env.PORT ?? 3000);
   
