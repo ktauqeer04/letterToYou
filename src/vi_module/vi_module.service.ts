@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ParseDatePipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
@@ -23,11 +23,7 @@ export class ViModuleService{
     async create(payload: createPayload) : Promise<responseSI<Letter>>{
 
         try {
-
-            console.log("here");
-            console.log(typeof payload.sendDate);
-            console.log('here in prisma');
-
+            
             const findExistingEmail = await this.prisma.letter.findUnique({
                 where: {
                     email: payload.email

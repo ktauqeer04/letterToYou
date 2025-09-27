@@ -1,5 +1,5 @@
 
-# LetterToYou
+# FutureMee
 
 ## Introduction
 
@@ -83,3 +83,6 @@ Response
 
 ```     
 
+### Architecture of FutureMee
+
+![](file:///C:/Users/TauqeerF/Pictures/Screenshots/Screenshot%202025-09-27%20225834.png)

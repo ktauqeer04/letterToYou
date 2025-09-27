@@ -8,11 +8,19 @@ import { ViModuleModule } from './vi_module/vi_module.module';
 import { JwtModule } from '@nestjs/jwt';
 import { WorkerModule } from './worker/worker.module';
 import { BullModule } from '@nestjs/bullmq';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 
 
 @Module({
   imports: [
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000,
+        limit: 10
+      }
+    ]),
     ConfigModule.forRoot({ isGlobal: true, envFilePath: '.env' }),
     BullModule.forRoot({
       connection: {
@@ -26,7 +34,14 @@ import { BullModule } from '@nestjs/bullmq';
     PrismaModule
   ],
   controllers: [AppController],
-  providers: [AppService, ViModuleService],
+  providers: [
+    AppService, 
+    ViModuleService, 
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard  
+    }
+  ],
 })
 export class AppModule {}
   
