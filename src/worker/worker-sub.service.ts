@@ -20,7 +20,7 @@ export class QueueConsumerService extends WorkerHost{
 
     try {
       
-      const { to, url, idUuid } = job.data;
+      const { to, url } = job.data;
       console.log("job data:", job.data);
 
       await this.emailService.sendMail({
@@ -68,11 +68,6 @@ export class QueueConsumerService extends WorkerHost{
   }
 
   async process(job: Job): Promise<any> {
-    
-    // const { to, url, idUuid } = job.data;
-    // console.log("job data:", job.data);
-
-    // console.log(`Processing job ${job.id} for url: ${url}`);
 
     try {
       
@@ -87,11 +82,10 @@ export class QueueConsumerService extends WorkerHost{
           await this.processSendEmail(job); 
           break;
         
-        
       }
 
     } catch (error) {
-      console.error(`Failed to process job ${job.id}:`, error);
+      console.error(`Failed to pro  cess job ${job.id}:`, error);
       throw new Error(`Failed to process job ${job.id}`);
     }
 

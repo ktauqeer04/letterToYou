@@ -28,10 +28,6 @@ export class ViModuleService{
             console.log(typeof payload.sendDate);
             console.log('here in prisma');
 
-            // if(typeof payload.sendDate != "string"){
-            //     throw new Error('sendDate is invalid');
-            // }
-
             const findExistingEmail = await this.prisma.letter.findUnique({
                 where: {
                     email: payload.email
@@ -142,6 +138,10 @@ export class ViModuleService{
 
         } catch (error: any){
 
+            console.error(error);
+            if(error.clientVersion){
+                throw new Error('sendDate is out of range');
+            }
 
             return {
                 success: false, 

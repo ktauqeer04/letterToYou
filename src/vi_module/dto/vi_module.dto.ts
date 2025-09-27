@@ -3,16 +3,16 @@ import { IsDateString, IsEmail, IsNotEmpty, IsString } from "class-validator";
 export class CreateLetterDto {
 
     @IsEmail()
-    @IsString()
-    @IsNotEmpty()
+    @IsString({ message: 'email must be a string' })
+    @IsNotEmpty({ message: 'email should not be empty'})
     email: string;
 
-    @IsString()
-    @IsNotEmpty()
+    @IsString({ message: 'content must be a string' })
+    @IsNotEmpty({ message: 'content should not be empty'})
     content: string;
 
-    @IsDateString({}, { message: 'sendDate must be an ISO 8601 date string' })
-    @IsNotEmpty()
+    @IsDateString({}, { message: 'sendDate is invalid' })
+    @IsNotEmpty({ message: 'sendDate should not be empty'})
     sendDate: Date | string;
     
 }

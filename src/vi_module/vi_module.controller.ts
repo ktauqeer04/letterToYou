@@ -2,7 +2,6 @@ import { Body, Controller, HttpStatus, Post, Res } from '@nestjs/common';
 import { ViModuleService } from './vi_module.service';
 import { CreateLetterDto } from './dto/vi_module.dto';
 import { responseCI } from '../interfaces/controller.interface';
-import { createPayload } from './interface/payload.interface';
 
 @Controller('vi-module')
 export class ViModuleController {
@@ -34,10 +33,20 @@ export class ViModuleController {
 
         } catch (error: any) {
 
+            if(error.message == 'sendDate is out of range'){
+                return res.status(HttpStatus.BAD_REQUEST).json({
+                    success: false,
+                    message: "Invalid inputs",
+                    error: {
+                        message: "sendDate is invalid"
+                    }
+                })
+            }
+
             return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
                 success: false,
                 message: 'Internal server error',
-                error: { message: error },
+                error: { message: error.message },
             });
             
         }

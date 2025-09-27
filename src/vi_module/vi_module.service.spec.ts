@@ -1,8 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ViModuleService } from './vi_module.service';
 import { ViModuleController } from './vi_module.controller';
-// import { responseSI } from 'src/interfaces/service.interface';
-// import { Letter, Prisma } from '@prisma/client';
 import { Queue } from 'bullmq';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
@@ -16,11 +14,6 @@ describe('viModuleService', () => {
   let jwtService: Partial<JwtService>;
   let configService: Partial<ConfigService>
 
-  // type createFn = () => Promise<responseSI<Letter>>;
-
-  // const mockViModuleService = {
-  //   create: jest.fn() as jest.MockedFunction<createFn>,
-  // } 
 
   const prismaMock = {
     letter: {

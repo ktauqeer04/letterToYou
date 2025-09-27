@@ -13,7 +13,7 @@ export class WorkerService {
         private readonly prisma: PrismaService
     ) {}
 
-    @Cron(CronExpression.EVERY_30_SECONDS)
+    @Cron(CronExpression.EVERY_2_HOURS)
     async processTask(): Promise<void>{
 
         console.log('Cron job running every 30 seconds with current time:', new Date().toISOString());
@@ -35,7 +35,7 @@ export class WorkerService {
         
         for(const letter of verifiedLetters){
             await this.emailQueue.add('sendEmail', {
-                email: letter.letter.email,
+                email: letter.letter.email, 
                 content: letter.content,
                 idUuid: letter.idUuid
                  }, {
