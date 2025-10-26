@@ -7,6 +7,7 @@ import { ValidationExceptionFilter } from './pipes/custom-validation';
 async function bootstrap() {
 
   const app = await NestFactory.create(AppModule);
+  app.enableCors();
   app.useGlobalPipes(new ValidationPipe({ 
     forbidUnknownValues: true,
    }));

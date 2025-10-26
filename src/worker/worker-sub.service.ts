@@ -5,7 +5,7 @@ import { Job } from "bullmq";
 import { PrismaService } from "src/prisma/prisma.service";
 import { htmlSkeleton } from "./html.skeleton";
 
-@Processor('send-bulk-email')
+@Processor('send-bulk-email', { limiter: {max: 15, duration: 10000 }})
 @Injectable()
 export class QueueConsumerService extends WorkerHost{
 
