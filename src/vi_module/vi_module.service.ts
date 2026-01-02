@@ -23,6 +23,8 @@ export class ViModuleService{
     async create(payload: createPayload) : Promise<responseSI<Letter>>{
 
         try {
+
+            console.log(payload);   
             
             const findExistingEmail = await this.prisma.letter.findUnique({
                 where: {

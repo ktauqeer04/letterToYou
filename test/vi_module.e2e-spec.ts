@@ -29,7 +29,7 @@ describe('VI_module Controller (e2e)', () => {
   it('should create and return a status code of 201', async () => {
 
     const payload = {
-        email: 'rediya3561@artvara.com',
+        email: 'test@testexample.com',
         content: 'example content',
         sendDate: '2025-09-30T00:00:00.000Z'
     }

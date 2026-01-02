@@ -1,0 +1,31 @@
+version: '3.8'
+services: 
+  database: 
+    image: postgres:18
+    container_name: postgres_temp
+    ports:
+      - "5432:5432"
+    environment:
+        - POSTGRES_USER=user
+        - POSTGRES_PASSWORD=password
+        - POSTGRES_DB=mydb
+
+  redis_service: 
+    image: redis:7.0.11
+    container_name: redis_temp
+    ports:
+      - "6379:6379" 
+  server: 
+    image: letter-to-you
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - DATABASE_URL=postgresql://user:password@postgres_temp:5432/mydb?schema=public
+      - REDIS_HOST=redis_temp
+      - REDIS_TEMP=6379
+      - JWT_SECRET=6f1a2c3e-4b7d-4e9f-9a2b-3c4d5e6f7a8b
+      - MAIL_HOST=smtp.gmail.com
+      - MAIL_USER=bordken228@gmail.com
+    ports:     
+      - "3000:3000"
