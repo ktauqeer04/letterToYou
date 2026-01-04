@@ -1,31 +1,33 @@
 version: '3.8'
-services: 
-  database: 
-    image: postgres:18
-    container_name: postgres_temp
-    ports:
-      - "5432:5432"
-    environment:
-        - POSTGRES_USER=user
-        - POSTGRES_PASSWORD=password
-        - POSTGRES_DB=mydb
 
+services: 
   redis_service: 
     image: redis:7.0.11
     container_name: redis_temp
-    ports:
-      - "6379:6379" 
+    restart: unless-stopped
+    networks:
+      - app-network
+  
   server: 
     image: letter-to-you
+    container_name: sirene
     build: 
       context: .
       dockerfile: Dockerfile
-    environment:
-      - DATABASE_URL=postgresql://user:password@postgres_temp:5432/mydb?schema=public
-      - REDIS_HOST=redis_temp
-      - REDIS_TEMP=6379
-      - JWT_SECRET=6f1a2c3e-4b7d-4e9f-9a2b-3c4d5e6f7a8b
-      - MAIL_HOST=smtp.gmail.com
-      - MAIL_USER=bordken228@gmail.com
-    ports:     
+    restart: unless-stopped
+    ports:
       - "3000:3000"
+    networks:
+      - app-network
+    environment:
+      - PORT=3000
+      - DATABASE_URL_PROD=${DATABASE_URL_PROD}
+      - REDIS_HOST=redis_service
+      - REDIS_PORT=6379
+      - JWT_SECRET=${JWT_SECRET}
+      - MAIL_HOST=${MAIL_HOST}
+      - MAIL_USER=${MAIL_USER}
+
+networks:
+  app-network:
+    driver: bridge

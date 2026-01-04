@@ -10,6 +10,6 @@ COPY . .
 
 RUN npx prisma generate 
 
-CMD [ "node", "dist/main.js" ]
-
 EXPOSE 3000
+
+CMD [ "node", "dist/main.js" ]
